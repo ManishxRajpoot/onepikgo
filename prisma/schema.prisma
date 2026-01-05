@@ -1,0 +1,114 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id            String    @id
+  shop          String
+  state         String
+  isOnline      Boolean   @default(false)
+  scope         String?
+  expires       DateTime?
+  accessToken   String
+  userId        BigInt?
+  firstName     String?
+  lastName      String?
+  email         String?
+  accountOwner  Boolean   @default(false)
+  locale        String?
+  collaborator  Boolean?  @default(false)
+  emailVerified Boolean?  @default(false)
+}
+
+model Store {
+  id                String   @id @default(cuid())
+  shopifyDomain     String   @unique
+  
+  // Form Settings
+  formEnabled       Boolean  @default(true)
+  buttonText        String   @default("Order Now - COD")
+  buttonColor       String   @default("#000000")
+  buttonTextColor   String   @default("#ffffff")
+  
+  // Field Visibility
+  showName          Boolean  @default(true)
+  showPhone         Boolean  @default(true)
+  showAddress       Boolean  @default(true)
+  showCity          Boolean  @default(true)
+  showPincode       Boolean  @default(true)
+  showState         Boolean  @default(true)
+  
+  // Field Labels
+  labelName         String   @default("Full Name")
+  labelPhone        String   @default("Phone Number")
+  labelAddress      String   @default("Address")
+  labelCity         String   @default("City")
+  labelPincode      String   @default("Pincode")
+  labelState        String   @default("State")
+  
+  // Plan & Limits
+  plan              String   @default("free") // free, pro, unlimited
+  ordersThisMonth   Int      @default(0)
+  monthResetDate    DateTime @default(now())
+  
+  // Metadata
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  orders            Order[]
+}
+
+model Order {
+  id                  String   @id @default(cuid())
+  storeId             String
+  
+  // Customer Info
+  customerName        String
+  customerPhone       String
+  customerEmail       String?
+  customerAddress     String
+  customerCity        String
+  customerPincode     String
+  customerState       String?
+  
+  // Product Info
+  productId           String
+  productTitle        String
+  productPrice        Decimal  @db.Decimal(10, 2)
+  productVariantId    String?
+  productImage        String?
+  
+  // Order Details
+  quantity            Int      @default(1)
+  totalAmount         Decimal  @db.Decimal(10, 2)
+  status              String   @default("pending") // pending, confirmed, delivered, rto, cancelled
+  
+  // Shopify Integration
+  shopifyOrderId      String?
+  shopifyOrderNumber  String?
+  
+  // Tracking
+  ipAddress           String?
+  userAgent           String?
+  deviceType          String?
+  
+  // Metadata
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  
+  // Relations
+  store               Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  
+  @@index([storeId])
+  @@index([status])
+  @@index([createdAt])
+}

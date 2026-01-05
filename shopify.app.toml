@@ -1,0 +1,27 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+name = "onepik-cod"
+client_id = "d9906e8917f81b3db865428da1ff2c2e"
+application_url = "https://onepikgo.vercel.app"
+embedded = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "write_products,write_orders,write_draft_orders,read_customers"
+
+[auth]
+redirect_urls = [
+  "https://onepikgo.vercel.app/auth/callback",
+  "https://onepikgo.vercel.app/auth/shopify/callback",
+  "https://onepikgo.vercel.app/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2024-10"
+
+[pos]
+embedded = false
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "onepik-go.myshopify.com"
